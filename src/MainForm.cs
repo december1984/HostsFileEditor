@@ -21,10 +21,12 @@ namespace HostsFileEditor
 {
     using System;
     using System.Collections.Generic;
+    using System.Drawing;
     using System.Linq;
     using System.Text;
     using System.Windows.Forms;
     using Equin.ApplicationFramework;
+    using HostsFileEditor.Controls;
     using HostsFileEditor.Extensions;
     using HostsFileEditor.Properties;
     using HostsFileEditor.Utilities;
@@ -86,6 +88,10 @@ namespace HostsFileEditor
             this.columnComment.DefaultCellStyle.NullValue = null;
             this.columnIpAddress.DefaultCellStyle.NullValue = null;
             this.columnHostnames.DefaultCellStyle.NullValue = null;
+
+            this.contextMenuTray.Items.Insert(0, new HostsArchiveListToolStripMenuItem(HostsArchiveList.Instance) { Text = "Archive" });
+
+            HostsFile.Instance.DefaultHostFileSaved += (s, e) => UpdateNotifyIcon();
         }
 
         #endregion
@@ -769,8 +775,25 @@ namespace HostsFileEditor
         {
             this.notifyIcon.Icon =
                 HostsFile.IsEnabled ?
-                Resources.HostsFileEditor : 
+                GetIcon() : 
                 Resources.HostsFileEditorDisabled;
+        }
+
+        private Icon GetIcon()
+        {
+            var active = HostsArchiveList.Instance.FirstOrDefault(a => a.IsActive);
+            if (active == null) return Resources.HostsFileEditor;
+            return AddLetter(active.FileName[0]);
+        }
+
+        private static readonly Font _iconLetterFont = new Font("Courier New", 22, FontStyle.Bold);
+
+        private Icon AddLetter(char letter)
+        {
+            var icon = Resources.HostsFileEditor.ToBitmap();
+            var graphics = Graphics.FromImage(icon);
+            graphics.DrawString($"{letter}", _iconLetterFont, Brushes.Black, 0, 0);
+            return Icon.FromHandle(icon.GetHicon());
         }
 
         /// <summary>

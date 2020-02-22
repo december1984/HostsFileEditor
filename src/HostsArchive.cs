@@ -91,6 +91,25 @@ namespace HostsFileEditor
             }
         }
 
+        private bool _isActive;
+
+        public bool IsActive
+        {
+            get => _isActive;
+            internal set 
+            {
+                if (_isActive == value) return;
+                _isActive = value;
+                OnIsActiveChanged();
+            }
+        }
+
+        public event EventHandler IsActiveChanged;
+        protected virtual void OnIsActiveChanged(EventArgs e = null)
+        {
+            IsActiveChanged?.Invoke(this, e ?? EventArgs.Empty);
+        }
+
         /// <summary>
         /// Validates the specified file path.
         /// </summary>

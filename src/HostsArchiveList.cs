@@ -22,6 +22,7 @@ namespace HostsFileEditor
     using System;
     using System.ComponentModel;
     using System.IO;
+    using System.Security.Cryptography;
     using HostsFileEditor.Extensions;
     using HostsFileEditor.Utilities;
 
@@ -48,6 +49,7 @@ namespace HostsFileEditor
         private HostsArchiveList()
         {
             this.Refresh();
+            HostsFile.Instance.DefaultHostFileSaved += (s, e) => CheckActiveArchive();
         }
 
         /// <summary>
@@ -90,7 +92,37 @@ namespace HostsFileEditor
                         this.Add(new HostsArchive { FilePath = file });
                     }
                 }
+
+                CheckActiveArchive();
             });
+        }
+
+        private string _hostsHash;
+
+        private void CheckActiveArchive()
+        {
+            _hostsHash = ComputeHash(HostsFile.DefaultHostFilePath);
+            foreach (var archive in this)
+            {
+                var hash = ComputeHash(archive.FilePath);
+                archive.IsActive = hash == _hostsHash;
+            }
+        }
+
+        protected override void OnListChanged(ListChangedEventArgs e)
+        {
+            if (e.ListChangedType == ListChangedType.ItemAdded)
+            {
+                var archive = this[e.NewIndex] as HostsArchive;
+                var hash = ComputeHash(archive.FilePath);
+                archive.IsActive = hash == _hostsHash;
+            }
+            base.OnListChanged(e);
+        }
+
+        private string ComputeHash(string filePath)
+        {
+            return Convert.ToBase64String(SHA256.Create().ComputeHash(File.ReadAllBytes(filePath)));
         }
     }
 }

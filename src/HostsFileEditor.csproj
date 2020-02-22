@@ -86,7 +86,13 @@
     <Compile Include="AboutForm.Designer.cs">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\HostsArchiveListToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\HostsArchiveDataGridView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\HostsArchiveToolStripMenuItem.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\MenuStripEx.cs">

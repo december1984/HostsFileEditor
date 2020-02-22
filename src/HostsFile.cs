@@ -24,7 +24,6 @@ namespace HostsFileEditor
     using System.IO;
     using System.Linq;
     using System.Linq.Expressions;
-
     using HostsFileEditor.Extensions;
     using HostsFileEditor.Properties;
     using HostsFileEditor.Utilities;
@@ -284,7 +283,18 @@ namespace HostsFileEditor
                 File.WriteAllLines(
                     saveFilePath,
                     this.Entries.Select(entry => entry.UnparsedText));
+
+                if (saveFilePath == DefaultHostFilePath)
+                {
+                    OnDefaultHostFileSaved();
+                }
             }
+        }
+
+        public event EventHandler DefaultHostFileSaved;
+        protected virtual void OnDefaultHostFileSaved(EventArgs e = null)
+        {
+            DefaultHostFileSaved?.Invoke(this, e ?? EventArgs.Empty);
         }
 
         /// <summary>
